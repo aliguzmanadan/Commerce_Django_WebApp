@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.deletion import CASCADE
 from django.db.models.fields import BooleanField, CharField, FloatField, TextField, URLField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 
@@ -20,3 +21,13 @@ class Auction_listing(models.Model):
     image_link = URLField(max_length=500, blank=True)
     categories = ManyToManyField(Category, blank=True, related_name="listings_per_category")
     in_watch_list = ManyToManyField(User, blank=True, related_name="wishes_per_user")
+
+class Bid(models.Model):
+    amount = FloatField()
+    listing = ForeignKey(Auction_listing, on_delete=models.CASCADE, related_name="bids_by_listing")
+    user = ForeignKey(User, on_delete=models.CASCADE, related_name='bids_by_user')
+
+class Comment(models.Model):
+    text = TextField()
+    listing = ForeignKey(Auction_listing, on_delete=models.CASCADE, related_name="comments_by_listing")
+    user = ForeignKey(User, on_delete=models.CASCADE, related_name="comments_by_user")
