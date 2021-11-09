@@ -63,3 +63,8 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+def create_listing(request):
+    return render(request, "auctions/create_listing.html", {
+        "Categories": Category.objects.all()
+    })

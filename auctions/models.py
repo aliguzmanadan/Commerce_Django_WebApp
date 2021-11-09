@@ -11,6 +11,9 @@ class User(AbstractUser):
 class Category(models.Model):
     title = CharField(max_length=64)
 
+    def __str__(self):
+        return f"{self.title}"
+
 class Auction_listing(models.Model):
     title = CharField(max_length=64)
     initial_price = DecimalField(max_digits=10, decimal_places=2)
@@ -23,7 +26,7 @@ class Auction_listing(models.Model):
     in_watch_list = ManyToManyField(User, blank=True, related_name="wishes_per_user")
 
     def __str__(self):
-        return f"{self.title}, initial price: {self.initial_price}, creator: {self.creator} "
+        return f"{self.title}, initial price: {self.initial_price}, creator: {self.creator}"
 
 class Bid(models.Model):
     amount = FloatField()
