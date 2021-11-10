@@ -8,34 +8,12 @@
         <div>{{ message }}</div>
     {% endif %}
 
-    <form action="{% url 'create_listing' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label class="form-label">Title of the new lisiting</label>
-            <input class="form-control" type="text" name="title" placeholder="Title">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Initial price</label>
-            <input class="form-control" type="text" name="initial_price" placeholder="10,00">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" name="description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-            <label class="form-label">URL for image (optional)</label>
-            <input class="form-control" type="url" name="url_image" placeholder="url/image">
-        </div>
-        <div class="form-group">
-            <label class="form-label">Category</label>
-            <select name="category" class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                {% for category in Categories %}
-                    <option value="{{category.id}}">{{ category }}</option>
-                {% endfor %}
-              </select>
-        </div>
-        <input class="btn btn-primary" type="submit" value="Create listing">
-    </form>
+    <div class="form-group">
+        <form action="{% url 'create_listing'%}", method="POST">
+            {% csrf_token%}
+            {{ form.as_p }}
+            <input class="btn btn-primary" type="submit" value="Create listing">
+        </form>
+    </div>
 
 {% endblock %}
