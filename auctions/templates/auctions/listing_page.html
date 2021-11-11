@@ -4,6 +4,10 @@
 
     <h2>{{ listing.title }}</h2>
 
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
     <div>
         Current price: {{ current_price }}
     </div>
@@ -15,13 +19,26 @@
     </div>
 
     {% if user.is_authenticated %}
-        <a href="{% url 'bid_page' listing.id %}"> Bid on this item </a>
+        <div>
+            <a href="{% url 'bid_page' listing.id %}"> Bid on this item </a>
+        </div>  
+        {% if in_watch_list %}
+            <div>
+                <a href="{% url 'remove_whatchlist' listing.id %}"> Remove from whatchlist </a>
+            </div>
+        {% else %}
+            <div>
+                <a href="{% url 'add_whatchlist' listing.id %}"> Add to whatchlist </a>
+            </div>
+        {% endif %}
+
+        {% if user == listing.creator and listing.is_active %}
+            <div>
+                <a href="{% url 'close_listing' listing.id %}"> Close listing </a>
+            </div>
+        {% endif %}
     {% endif %}
 
-    {% if in_watch_list %}
-        <a href="{% url 'remove_whatchlist' listing.id %}"> Remove from whatchlist </a>
-    {% else %}
-        <a href="{% url 'add_whatchlist' listing.id %}"> Add to whatchlist </a>
-    {% endif %}
+    
 
 {% endblock %}

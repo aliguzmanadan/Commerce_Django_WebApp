@@ -4,6 +4,7 @@ from django.db.models import fields
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import BooleanField, CharField, DecimalField, FloatField, TextField, URLField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
+from django.db.models import Max
 
 
 
@@ -30,10 +31,28 @@ class Auction_listing(models.Model):
     def __str__(self):
         return f"{self.title}, initial price: {self.initial_price}, creator: {self.creator}"
 
+    def HighestBid(self):
+        '''Returns the higest bid for a listing'''
+        if self.bids_by_listing.exists():
+            max_bids_amount = self.bids_by_listing.all().aggregate(Max('amount'))['amount__max']
+            return self.bids_by_listing.all().get(amount = max_bids_amount)
+        else:
+            return None
+
+    def current_price(self):
+        if self.HighestBid():
+            return self.HighestBid().amount
+        else:
+            return self.initial_price
+        
+
 class Bid(models.Model):
     amount = FloatField()
     listing = ForeignKey(Auction_listing, on_delete=models.CASCADE, related_name="bids_by_listing")
     user = ForeignKey(User, on_delete=models.CASCADE, related_name='bids_by_user')
+
+    def __str__(self):
+        return f"Bid from {self.user} on {self.listing.title}, created by {self.listing.creator}"
 
 class Comment(models.Model):
     text = TextField()

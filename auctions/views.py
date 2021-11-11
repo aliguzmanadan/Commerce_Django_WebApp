@@ -8,7 +8,6 @@ from django.forms import ModelForm
 from .models import User, Auction_listing, Category, Bid, Comment
 from .forms import ListingForm, BidForm
 
-from .auxiliary_functions import current_price
 
 
 def index(request):
@@ -16,7 +15,10 @@ def index(request):
         "Listings": Auction_listing.objects.filter(is_active = True)
     })
 
-
+def non_active_listings(request):
+    return render(request, "auctions/non_active_listings.html", {
+        "Listings": Auction_listing.objects.filter(is_active = False)
+    })
 
 def login_view(request):
     if request.method == "POST":
@@ -99,7 +101,7 @@ def create_listing(request):
 
 def listing_page(request, listing_id):
     listing = Auction_listing.objects.get(pk=listing_id)
-    price = current_price(listing)
+    price = listing.current_price()
     return render(request, "auctions/listing_page.html", {
         "listing": listing,
         "current_price": price,
@@ -119,7 +121,7 @@ def bid_page(request, listing_id):
             amount = form.cleaned_data["amount"]
 
             #if the amount is bigger than the current price, create the bid and return to the listing page
-            if amount > current_price(listing):
+            if amount > listing.current_price():
                 new_bid = Bid(amount=amount, listing=listing, user=request.user)
                 new_bid.save()
                 return HttpResponseRedirect(reverse("listing_page", args=(listing.id,)))
@@ -148,3 +150,34 @@ def remove_whatchlist(request, listing_id):
     listing = Auction_listing.objects.get(pk=listing_id)
     listing.in_watch_list.remove(request.user)
     return HttpResponseRedirect(reverse("listing_page", args=(listing.id,)))
+
+def close_listing(request, listing_id):
+    listing = Auction_listing.objects.get(pk=listing_id)
+    HighestBid = listing.HighestBid()
+
+    #Checking whter ther is a higest bid
+    if HighestBid:
+        HighestBidder = HighestBid.user
+        listing.winner = HighestBidder
+
+        #making the lisiting non-active
+        listing.is_active=False
+
+        #saving updates in the listing
+        listing.save()
+
+        #redirect to index page
+        return HttpResponseRedirect(reverse("index")) 
+
+    else:
+        price = listing.current_price()
+        return render(request, "auctions/listing_page.html", {
+            "listing": listing,
+            "current_price": price,
+            "in_watch_list": request.user.wishes_per_user.filter(id = listing.id).exists(),
+            "message": "This listing cannot be closed: There are no bids for this listing"
+        })
+
+
+    
+    
