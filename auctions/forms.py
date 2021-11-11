@@ -1,6 +1,7 @@
+from django.db.models import fields
 from django.forms import ModelForm
 from django import forms
-from .models import Auction_listing, Category
+from .models import Auction_listing, Bid, Category
 
 class ListingForm(ModelForm):
     class Meta:
@@ -8,7 +9,11 @@ class ListingForm(ModelForm):
         fields = ('title', 'initial_price', 'description', 'image_link', 'categories')
 
         labels = {
-            "title": "Title", 'initial_price': "Initial price"
+            'title': "Title*",
+            'initial_price': "Initial price*",
+            'description': "Description*",
+            'image_link': "Link for the image (optional)",
+            'categories': "Select categories (optional)"
         }
 
         widgets = {
@@ -17,4 +22,15 @@ class ListingForm(ModelForm):
             'description': forms.Textarea(attrs={'class': "form-control", "rows": 3, 'placeholder': "Add a description"}),
             'image_link': forms.URLInput(attrs={'class': "form-control"}),
             'categories': forms.SelectMultiple(attrs={'class': "form-control"})
+        }
+
+class BidForm(ModelForm):
+    class Meta:
+        model = Bid
+        fields = ('amount',)
+        labels = {
+            'amount': "Amount of the bid"
+        }
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': "form-control", 'placeholder': "10,00"})
         }

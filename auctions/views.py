@@ -6,7 +6,9 @@ from django.urls import reverse
 from django.forms import ModelForm
 
 from .models import User, Auction_listing, Category, Bid, Comment
-from .forms import ListingForm
+from .forms import ListingForm, BidForm
+
+from .auxiliary_functions import current_price
 
 
 def index(request):
@@ -103,12 +105,34 @@ def listing_page(request, listing_id):
         "current_price": price
     })
 
-def current_price(listing):
-    #getting all bids for the listing
-    bids = listing.bids_by_listing.all()
-    if bids:
-        #Take all bids amounts and return the hihgest
-        amounts = [bid.amount for bid in bids]
-        return max(amounts)
-    else: 
-        return listing.initial_price
+
+def bid_page(request, listing_id):
+    #Recover listing object
+    listing = Auction_listing.objects.get(pk=listing_id)
+
+    if request.method == "POST":
+        form = BidForm(request.POST)
+
+        if form.is_valid():
+            #Isolate the amount from the form
+            amount = form.cleaned_data["amount"]
+
+            #if the amount is bigger than the current price, create the bid and return to the listing page
+            if amount > current_price(listing):
+                new_bid = Bid(amount=amount, listing=listing, user=request.user)
+                new_bid.save()
+                return HttpResponseRedirect(reverse("listing_page", args=(listing.id,)))
+
+            #if not, send redirect again to the same bidpage with an error message
+            else:
+                return render(request, "auctions/bid_page.html", {
+                    "listing": listing,
+                    "form": BidForm(),
+                    "message": "Error: The amount should be bigger than the initial price and any previous bid."
+                })
+
+
+    return render(request, "auctions/bid_page.html", {
+        "listing": listing,
+        "form": BidForm()
+    })
