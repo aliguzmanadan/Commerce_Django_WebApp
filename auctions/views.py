@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.forms import ModelForm
 
 from .models import User, Auction_listing, Category, Bid, Comment
-from .forms import ListingForm, BidForm
+from .forms import ListingForm, BidForm, CommentForm
 
 
 
@@ -105,7 +105,9 @@ def listing_page(request, listing_id):
     return render(request, "auctions/listing_page.html", {
         "listing": listing,
         "current_price": price,
-        "in_watch_list": request.user.wishes_per_user.filter(id = listing.id).exists()
+        "in_watch_list": request.user.wishes_per_user.filter(id = listing.id).exists(),
+        "comments": listing.comments_by_listing.all(),
+        "comment_form": CommentForm()
     })
 
 
@@ -179,5 +181,20 @@ def close_listing(request, listing_id):
         })
 
 
-    
+def new_comment(request, listing_id):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            #isolate the text of the comment
+            text = form.cleaned_data["text"]
+            #get the listing
+            listing = Auction_listing.objects.get(pk=listing_id)
+
+            #create new comment 
+            new_comment = Comment(text=text, listing=listing, user = request.user)
+            new_comment.save()
+
+            return HttpResponseRedirect(reverse("listing_page", args=(listing.id,))) 
+
     

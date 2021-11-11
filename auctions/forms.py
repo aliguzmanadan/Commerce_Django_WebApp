@@ -1,7 +1,7 @@
 from django.db.models import fields
 from django.forms import ModelForm
 from django import forms
-from .models import Auction_listing, Bid, Category
+from .models import Auction_listing, Bid, Category, Comment
 
 class ListingForm(ModelForm):
     class Meta:
@@ -33,4 +33,15 @@ class BidForm(ModelForm):
         }
         widgets = {
             'amount': forms.NumberInput(attrs={'class': "form-control", 'placeholder': "10,00"})
+        }
+
+class CommentForm(ModelForm):
+    class Meta: 
+        model = Comment
+        fields = ('text',)
+        labels = {
+            'text': ""
+        }
+        widgets = {
+            'text': forms.TextInput(attrs={'class': "form-control", 'placeholder': "Insert here your comment..."})
         }

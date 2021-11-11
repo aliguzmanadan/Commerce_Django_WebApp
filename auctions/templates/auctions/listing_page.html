@@ -19,6 +19,21 @@
     </div>
 
     {% if user.is_authenticated %}
+        <h4>Comments:</h4>
+        {% for comment in comments %}
+            <div> BY {{ comment.user }}:</div>
+            <div> {{comment.text }} </div>
+        {% empty %}
+            No comments
+        {% endfor %}
+
+        <div class="form-group">
+            <form action="{% url 'new_comment' listing.id %}", method="POST">
+                {% csrf_token%}
+                {{ comment_form }}
+                <input class="btn btn-primary" type="submit" value="Add comment">
+            </form>
+
         <div>
             <a href="{% url 'bid_page' listing.id %}"> Bid on this item </a>
         </div>  
