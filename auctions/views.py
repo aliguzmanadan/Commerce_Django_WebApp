@@ -102,7 +102,8 @@ def listing_page(request, listing_id):
     price = current_price(listing)
     return render(request, "auctions/listing_page.html", {
         "listing": listing,
-        "current_price": price
+        "current_price": price,
+        "in_watch_list": request.user.wishes_per_user.filter(id = listing.id).exists()
     })
 
 
@@ -136,3 +137,14 @@ def bid_page(request, listing_id):
         "listing": listing,
         "form": BidForm()
     })
+
+def add_whatchlist(request, listing_id):
+    listing = Auction_listing.objects.get(pk=listing_id)
+    listing.in_watch_list.add(request.user)
+    return HttpResponseRedirect(reverse("listing_page", args=(listing.id,)))
+
+
+def remove_whatchlist(request, listing_id):
+    listing = Auction_listing.objects.get(pk=listing_id)
+    listing.in_watch_list.remove(request.user)
+    return HttpResponseRedirect(reverse("listing_page", args=(listing.id,)))
