@@ -1,8 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import fields
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import BooleanField, CharField, DecimalField, FloatField, TextField, URLField
 from django.db.models.fields.related import ForeignKey, ManyToManyField
+
 
 
 class User(AbstractUser):
@@ -37,3 +39,4 @@ class Comment(models.Model):
     text = TextField()
     listing = ForeignKey(Auction_listing, on_delete=models.CASCADE, related_name="comments_by_listing")
     user = ForeignKey(User, on_delete=models.CASCADE, related_name="comments_by_user")
+

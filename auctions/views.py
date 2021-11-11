@@ -68,6 +68,28 @@ def register(request):
         return render(request, "auctions/register.html")
 
 def create_listing(request):
+    if request.method == "POST":
+        form = ListingForm(request.POST)
+        
+        if form.is_valid():
+            #Isolate the info from the form
+            title = form.cleaned_data["title"]
+            initial_price = form.cleaned_data["initial_price"]
+            description = form.cleaned_data["description"]
+            image_link = form.cleaned_data["image_link"]
+            categories = form.cleaned_data["categories"]
+
+            #Create the new lisitng
+            listing = Auction_listing(title=title, initial_price=initial_price, description=description, image_link=image_link, creator=request.user)
+            listing.save()
+
+            #Add the categories if any
+            for category in categories:
+                listing.categories.add(category)
+
+            #redirect to index page
+            return HttpResponseRedirect(reverse("index")) 
+
     return render(request, "auctions/create_listing.html", {
         "form": ListingForm()
     })
