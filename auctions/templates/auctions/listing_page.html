@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2>{{ listing.title }}</h2>
+
+    <div>
+        Current price: {{ current_price }}
+    </div>
+    <div>
+        Description: {{ listing.description }}
+    </div>
+    <div>
+        Created by: {{ listing.creator }}
+    </div>
+
+    
+
+{% endblock %}

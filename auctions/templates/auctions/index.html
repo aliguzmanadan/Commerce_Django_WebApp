@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
-                        <a href="{% url 'index' %}"> 
+                        <a href="{% url 'listing_page' listing.id%}"> 
                             <h5 class="card-title">{{ listing.title }}</h5>
                         </a>
                         <h6 class="card-subtitle mb-2 text-muted"> Initial price: {{listing.initial_price }} EUR</h6>

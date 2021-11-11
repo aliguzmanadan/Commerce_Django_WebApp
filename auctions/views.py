@@ -9,11 +9,11 @@ from .models import User, Auction_listing, Category, Bid, Comment
 from .forms import ListingForm
 
 
-
 def index(request):
     return render(request, "auctions/index.html", {
         "Listings": Auction_listing.objects.filter(is_active = True)
     })
+
 
 
 def login_view(request):
@@ -93,3 +93,22 @@ def create_listing(request):
     return render(request, "auctions/create_listing.html", {
         "form": ListingForm()
     })
+
+
+def listing_page(request, listing_id):
+    listing = Auction_listing.objects.get(pk=listing_id)
+    price = current_price(listing)
+    return render(request, "auctions/listing_page.html", {
+        "listing": listing,
+        "current_price": price
+    })
+
+def current_price(listing):
+    #getting all bids for the listing
+    bids = listing.bids_by_listing.all()
+    if bids:
+        #Take all bids amounts and return the hihgest
+        amounts = [bid.amount for bid in bids]
+        return max(amounts)
+    else: 
+        return listing.initial_price
