@@ -1,9 +1,14 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-    
-    {% for listing in Listings %}
+
+    <h2>Watchlist of {{ user.username }}</h2>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    {% for listing in watchlist %}
         <div class="card mb-3" style="max-width: 75%;">
             <div class="row g-0">
                 <div class="col-md-4">
@@ -29,6 +34,4 @@
         There are no listings
     {% endfor %}
 
-
-    
 {% endblock %}

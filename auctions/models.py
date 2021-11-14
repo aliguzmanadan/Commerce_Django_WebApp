@@ -59,3 +59,6 @@ class Comment(models.Model):
     listing = ForeignKey(Auction_listing, on_delete=models.CASCADE, related_name="comments_by_listing")
     user = ForeignKey(User, on_delete=models.CASCADE, related_name="comments_by_user")
 
+    def __str__(self):
+        return f"Comment: {self.id}, User: {self.user}, on listing: {self.listing.title} "
+

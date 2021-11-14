@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2>Categories</h2>
+
+    {% if message %}
+        <div>{{ message }}</div>
+    {% endif %}
+
+    <ul class="list-group">
+        {% for category in categories %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="{% url 'category_page' category.id%}"> {{ category }} </a>
+            <span class="badge bg-primary rounded-pill">14</span>
+            </li>
+        {% empty %}
+            There are no categories
+        {% endfor %}
+      </ul>
+{% endblock %}

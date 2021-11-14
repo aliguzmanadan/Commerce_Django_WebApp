@@ -197,4 +197,23 @@ def new_comment(request, listing_id):
 
             return HttpResponseRedirect(reverse("listing_page", args=(listing.id,))) 
 
-    
+def watchlist(request):
+    watchlist = request.user.wishes_per_user.all()
+    return render(request, "auctions/watchlist.html",{
+        "watchlist": watchlist
+    }
+    )
+
+def categories(request):
+    categories = Category.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+    })
+
+def category_page(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    listings = category.listings_per_category.filter(is_active = True)
+    return render(request, "auctions/category_page.html", {
+        "category": category,
+        "listings": listings
+    }) 
