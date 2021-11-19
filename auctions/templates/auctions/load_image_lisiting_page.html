@@ -1,0 +1,9 @@
+{% if listing.image %}
+    <div class="col-md-4">
+        <img src="{{listing.image.url}}" class="img-fluid rounded-start" alt="..." style="width: 100% \9; max-height: 400px;">
+    </div>
+{% else %}
+    <div class="col-md-4">
+        {% load static %}<img src="{% static 'auctions/no-image-available-icon.jpeg' %}"  class="img-fluid rounded-start" alt="..." style="width: 100% \9; max-height: 400px;">
+    </div>
+{% endif %}

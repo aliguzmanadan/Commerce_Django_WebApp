@@ -5,11 +5,15 @@
     <h2>Create Listing</h2>
 
     {% if message %}
-        <div>{{ message }}</div>
+        {% for key in message%}
+            {{key}}
+        {%empty%}
+            caca
+        {%endfor%}
     {% endif %}
 
     <div class="form-group">
-        <form action="{% url 'create_listing'%}", method="POST">
+        <form action="{% url 'create_listing'%}", method="POST", enctype="multipart/form-data">
             {% csrf_token%}
             {{ form.as_p }}
             <input class="btn btn-primary" type="submit" value="Create listing">

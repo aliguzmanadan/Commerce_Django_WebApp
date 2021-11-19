@@ -73,18 +73,18 @@ def register(request):
 
 def create_listing(request):
     if request.method == "POST":
-        form = ListingForm(request.POST)
+        form = ListingForm(request.POST, request.FILES)
         
         if form.is_valid():
             #Isolate the info from the form
             title = form.cleaned_data["title"]
             initial_price = form.cleaned_data["initial_price"]
             description = form.cleaned_data["description"]
-            image_link = form.cleaned_data["image_link"]
+            image = form.cleaned_data["image"]
             categories = form.cleaned_data["categories"]
 
             #Create the new lisitng
-            listing = Auction_listing(title=title, initial_price=initial_price, description=description, image_link=image_link, creator=request.user)
+            listing = Auction_listing(title=title, initial_price=initial_price, description=description, image=image, creator=request.user)
             listing.save()
 
             #Add the categories if any
@@ -99,15 +99,15 @@ def create_listing(request):
     })
 
 
-def listing_page(request, listing_id):
+def listing_page(request, listing_id, wrong_bid=False):
     listing = Auction_listing.objects.get(pk=listing_id)
-    price = listing.current_price()
     return render(request, "auctions/listing_page.html", {
         "listing": listing,
-        "current_price": price,
         "in_watch_list": request.user.wishes_per_user.filter(id = listing.id).exists(),
         "comments": listing.comments_by_listing.all(),
-        "comment_form": CommentForm()
+        "comment_form": CommentForm(),
+        "bid_form": BidForm(), 
+        "wrong_bid": wrong_bid
     })
 
 
@@ -130,17 +130,7 @@ def bid_page(request, listing_id):
 
             #if not, send redirect again to the same bidpage with an error message
             else:
-                return render(request, "auctions/bid_page.html", {
-                    "listing": listing,
-                    "form": BidForm(),
-                    "message": "Error: The amount should be bigger than the initial price and any previous bid."
-                })
-
-
-    return render(request, "auctions/bid_page.html", {
-        "listing": listing,
-        "form": BidForm()
-    })
+                return listing_page(request, listing_id, True)
 
 def add_whatchlist(request, listing_id):
     listing = Auction_listing.objects.get(pk=listing_id)

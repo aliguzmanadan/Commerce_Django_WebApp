@@ -2,56 +2,128 @@
 
 {% block body %}
 
-    <h2>{{ listing.title }}</h2>
+    <h2>Listing: {{ listing.title }}</h2>
 
     {% if message %}
         <div>{{ message }}</div>
     {% endif %}
 
-    <div>
-        Current price: {{ current_price }}
-    </div>
+    {% if user.is_authenticated %}
+        <div style="margin-bottom: 10px;">
+            {% if in_watch_list %}
+                <a href="{% url 'remove_whatchlist' listing.id %}"> 
+                    <button type="button" class="btn btn-primary btn-sm">Remove from watchlist</button> 
+                </a>
+            {%else%}
+                <a href="{% url 'add_whatchlist' listing.id %}"> 
+                    <button type="button" class="btn btn-secondary btn-sm">Add to watchlist</button>
+                </a>
+            {% endif %}
+
+            {% if user == listing.creator and listing.is_active %}
+                <a href="{% url 'close_listing' listing.id %}"> 
+                    <button type="button" class="btn btn-secondary btn-sm">Close listing </button>
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% include 'auctions/load_image_lisiting_page.html' %}
+
     <div>
         Description: {{ listing.description }}
     </div>
+
     <div>
-        Created by: {{ listing.creator }}
+        {% if listing.is_active %}
+            <h2> {{ listing.current_price }} EUR </h2>
+        {% else %}
+            <h2> Sold by: {{ listing.current_price }} EUR </h2>
+            {% endif %}
+    </div>
+
+    
+        
+    
+
+    
+    
+    
+    {% if listing.is_active %}
+        {% if wrong_bid %}
+            <div class="alert alert-danger" role="alert">
+                Error placing bid: The new bid should be higher than the current price
+            </div>
+        {% endif %}
+
+        <div> 
+            {{ listing.AmountOfBids }} bid(s) so far.
+            {% if listing.HighestBid.user == user %}
+                Your bid is the current bid.
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <form action="{% url 'bid_page' listing.id%}", method="POST">
+                {% csrf_token%}
+                {{ bid_form }}
+                <div style="padding: 10px;"><input class="btn btn-primary" type="submit" value="Place bid"></div>
+            </form>
+        </div>
+
+    {% else %}
+       There were {{ listing.AmountOfBids }} bid(s) for this listing.
+       {% if user == listing.winner %}
+            You won this listing!
+       {% endif%}
+    {% endif%}
+    
+    <div>
+        <h2>Deatils</h2>
+        <ul>
+            <li> Created by: {{ listing.creator }} </li>
+            <li> Categories: 
+                <ul>
+                    {% for category in listing.categories.all %}
+                        {{ category }}
+                    {% empty %}
+                        No categories
+                    {% endfor %}
+                
+                </ul>
+            </li>
+        </ul>
     </div>
 
     {% if user.is_authenticated %}
-        <h4>Comments:</h4>
-        {% for comment in comments %}
-            <div> BY {{ comment.user }}:</div>
-            <div> {{comment.text }} </div>
-        {% empty %}
-            No comments
-        {% endfor %}
-
-        <div class="form-group">
-            <form action="{% url 'new_comment' listing.id %}", method="POST">
-                {% csrf_token%}
-                {{ comment_form }}
-                <input class="btn btn-primary" type="submit" value="Add comment">
-            </form>
-
-        <div>
-            <a href="{% url 'bid_page' listing.id %}"> Bid on this item </a>
+        <div class="card">
+            <div class="card-header">
+                <h4>Comments ({{ listing.AmountOfComments }}):</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for comment in comments %}
+                        <li class="list-group-item">
+                            <h6>Comment by {{ comment.user }}:</h6>
+                             {{comment.text }}
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">
+                            <div> No comments</div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="form-group">
+                <form action="{% url 'new_comment' listing.id %}", method="POST">
+                    {% csrf_token%}
+                    {{ comment_form }}
+                    <input class="btn btn-primary" type="submit" value="Add comment" style="margin-top: 10px;">
+                </form>
+            <div>
         </div>  
-        {% if in_watch_list %}
-            <div>
-                <a href="{% url 'remove_whatchlist' listing.id %}"> Remove from whatchlist </a>
-            </div>
-        {% else %}
-            <div>
-                <a href="{% url 'add_whatchlist' listing.id %}"> Add to whatchlist </a>
-            </div>
-        {% endif %}
 
-        {% if user == listing.creator and listing.is_active %}
-            <div>
-                <a href="{% url 'close_listing' listing.id %}"> Close listing </a>
-            </div>
-        {% endif %}
+        
     {% endif %}
 
     
