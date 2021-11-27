@@ -23,6 +23,9 @@ class Category(models.Model):
     def AmountOfListings(self):
         return self.listings_per_category.count()
 
+    def AmountOfActiveListings(self):
+        return self.listings_per_category.filter(is_active = True).count()
+
 class Auction_listing(models.Model):
     title = CharField(max_length=64)
     initial_price = DecimalField(max_digits=10, decimal_places=2)

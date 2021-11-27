@@ -12,7 +12,7 @@
         {% for category in categories %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <a href="{% url 'category_page' category.id%}"> {{ category }} </a>
-            <span class="badge bg-primary rounded-pill">{{ category.AmountOfListings }}</span>
+            <span class="badge bg-primary rounded-pill">{{ category.AmountOfActiveListings }}</span>
             </li>
         {% empty %}
             There are no categories
